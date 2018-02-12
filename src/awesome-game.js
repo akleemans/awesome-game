@@ -1,5 +1,5 @@
-// 20 x 10 Tiles visible => 320 x 160, scaling will do the rest
-var game = new Phaser.Game(320, 160, Phaser.CANVAS, 'phaser-example', {
+// 16 x 12 Tiles visible => scaling will do the rest
+var game = new Phaser.Game(352, 192, Phaser.CANVAS, 'phaser-example', {
   preload: preload,
   create: create,
   update: update,
@@ -11,12 +11,10 @@ function preload() {
   game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
   game.load.image('background', 'assets/background2.png');
 
-
   game.load.tilemap('base-level', 'assets/tilemaps/maps/test16.json', null, Phaser.Tilemap.TILED_JSON);
 
   //  Next we load the tileset. This is just an image, loaded in via the normal way we load images:
   game.load.image('tiles', 'assets/tilemaps/tiles/platformer_tiles.png');
-
 }
 
 var player;
@@ -24,14 +22,15 @@ var facing = 'left';
 var jumpTimer = 0;
 var cursors;
 var jumpButton;
-var bg;
+var backgroundLayer;
+var baseLayer;
+var collisionLayer;
 var baseSpeed = 250;
 
 var map;
 var layer;
 
 function create() {
-
   game.physics.startSystem(Phaser.Physics.ARCADE);
   game.physics.arcade.gravity.y = 300;
   // bg = game.add.tileSprite(0, 0, 800, 600, 'background');
@@ -42,13 +41,16 @@ function create() {
   map.addTilesetImage('platformer_tiles', 'tiles');
 
   // new layer from map_tiles-layer in map data, like Phaser.Sprite, in display list
-  layer = map.createLayer('map_tiles');
+  backgroundLayer = map.createLayer('bg');
+  baseLayer = map.createLayer('map_tiles');
 
-  // define collision for tile # 43 = ground
-  map.setCollisionBetween(40, 43);
+  // load collision layer, also a tilemap layer
+  collisionLayer = map.createLayer('collision');
+  collisionLayer.visible = false;
+  map.setCollisionByExclusion([], true, collisionLayer);
 
   //  This resizes the game world to match the layer dimensions
-  layer.resizeWorld();
+  collisionLayer.resizeWorld();
 
   // player
   player = game.add.sprite(32, 20, 'dude');
@@ -68,7 +70,7 @@ function create() {
 
   // scale the game
   game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
-  game.scale.setUserScale(3, 3);
+  game.scale.setUserScale(2, 2);
 
   // enable crisp rendering
   game.renderer.renderSession.roundPixels = true;
@@ -81,7 +83,7 @@ function create() {
 }
 
 function update() {
-  this.game.physics.arcade.collide(player, layer);
+  this.game.physics.arcade.collide(player, collisionLayer);
 
   player.body.velocity.x = 0;
 
