@@ -65,8 +65,8 @@
  </layer>
  <objectgroup name="meta">
   <object id="6" name="pit" x="224" y="176" width="96" height="48"/>
-  <object id="8" name="finish" x="960" y="64" width="32" height="32"/>
-  <object id="9" name="torch" x="944" y="176" width="32" height="32"/>
+  <object id="8" name="finish" x="960" y="48" width="32" height="32"/>
+  <object id="9" name="torch" x="944" y="160" width="32" height="32"/>
   <object id="10" name="start" x="48" y="96" width="16" height="32"/>
  </objectgroup>
 </map>

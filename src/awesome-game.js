@@ -6,7 +6,11 @@ var game = new Phaser.Game(352, 192, Phaser.CANVAS, 'phaser-example', {
   render: render
 });
 
+var DEBUG = false;
+
 function preload() {
+  game.load.bitmapFont('carrier_command', 'assets/fonts/carrier_command.png', 'assets/fonts/carrier_command.xml');
+
   game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
   game.load.image('background', 'assets/background2.png');
 
@@ -36,12 +40,13 @@ var torchRectangle;
 var pitRectangle;
 
 var statusText;
-var statusTimer;
+var statusTimer = 0;
 
 function create() {
   game.physics.startSystem(Phaser.Physics.ARCADE);
   game.physics.arcade.gravity.y = 300;
   // bg = game.add.tileSprite(0, 0, 800, 600, 'background');
+  // game.stage.backgroundColor = "#111111";
 
   map = game.add.tilemap('base-level');
 
@@ -83,7 +88,7 @@ function create() {
   game.scale.setUserScale(2, 2);
 
   // enable crisp rendering
-  // game.renderer.renderSession.roundPixels = true;
+  game.renderer.renderSession.roundPixels = true;
   Phaser.Canvas.setImageRenderingCrisp(game.canvas);
 
   // add input
@@ -128,48 +133,52 @@ function update() {
 
   this.game.physics.arcade.collide(player, collisionLayer);
 
-
-  if (Phaser.Rectangle.containsPoint(finishRectangle, player.position)) {
+  if (game.time.now > statusTimer && Phaser.Rectangle.containsPoint(finishRectangle, player.position)) {
     console.log("reached finish");
-  }
 
-  if (Phaser.Rectangle.containsPoint(pitRectangle, player.position)) {
-    console.log("reached pit");
-    // TODO
+    statusText = game.add.bitmapText(20, 50, 'carrier_command', 'Finish!', 24);
+    statusTimer = game.time.now + 3000;
+
     resetPlayer();
   }
 
-  if (Phaser.Rectangle.containsPoint(torchRectangle, player.position)) {
-    console.log("reached torch");
-    // TODO
+  if (Phaser.Rectangle.containsPoint(pitRectangle, player.position)) {
+    console.log("reached pit - showing text");
+
+    statusText = game.add.bitmapText(20, 50, 'carrier_command', 'You\'re dead!', 24);
+    statusTimer = game.time.now + 3000;
+
+    resetPlayer();
   }
 
+  if (game.time.now > statusTimer && Phaser.Rectangle.containsPoint(torchRectangle, player.position)) {
+    console.log("reached torch");
 
-  /*
-  // idea for later: slide down walls :-)
-  this.game.physics.arcade.collide(player, collisionLayer, function(p) {
-    p.body.velocity.y = 0;
-  });
-   */
+    statusText = game.add.bitmapText(20, 50, 'carrier_command', 'Got torch!', 24);
+    statusTimer = game.time.now + 3000;
+  }
 
   if (jumpButton.isDown && player.body.onFloor() && game.time.now > jumpTimer) {
     player.body.velocity.y = -350;
     jumpTimer = game.time.now + 300;
   }
 
+  // cleanup status text
+  if (statusText && game.time.now > statusTimer) {
+    statusText.destroy();
+  }
 }
 
 function render() {
+  if (DEBUG) {
+    // debug info
+    //game.debug.bodyInfo(player, 16, 24);
 
-  // debug info
-  // game.debug.bodyInfo(player, 16, 24);
-
-  /*
-  game.debug.body(player);
-  game.debug.geom(finishRectangle, 'rgba(255,0,0,0.2)');
-  game.debug.geom(pitRectangle, 'rgba(255,0,0,0.2)');
-  game.debug.geom(torchRectangle, 'rgba(255,0,0,0.2)');
-  */
+    game.debug.body(player);
+    game.debug.geom(finishRectangle, 'rgba(255,0,0,0.2)');
+    game.debug.geom(pitRectangle, 'rgba(255,0,0,0.2)');
+    game.debug.geom(torchRectangle, 'rgba(255,0,0,0.2)');
+  }
 
   // game.debug.text( "This is debug text", 100, 380 );
 
@@ -194,14 +203,14 @@ function prepareMetaObjects() {
   var pit = map.objects.meta.find(function (o) {
     return o.name === 'pit'
   });
-  pitRectangle = new Phaser.Rectangle(pit.x - 1, pit.y - 1, pit.width + 2, pit.height + 2);
+  pitRectangle = new Phaser.Rectangle(pit.x, pit.y, pit.width, pit.height);
   console.log("pitRectangle:", pitRectangle);
 
   // prepare torch rectangle
   var torch = map.objects.meta.find(function (o) {
     return o.name === 'torch'
   });
-  torchRectangle = new Phaser.Rectangle(torch.x - 1, torch.y - 1, torch.width + 2, torch.height + 2);
+  torchRectangle = new Phaser.Rectangle(torch.x, torch.y, torch.width, torch.height);
   console.log("torchRectangle:", torchRectangle);
 }
 
