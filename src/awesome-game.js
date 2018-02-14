@@ -13,6 +13,7 @@ function preload() {
 
   game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
   game.load.image('background', 'assets/background2.png');
+  game.load.spritesheet('save-crystal', 'assets/img/save-crystal.png', 32, 32);
 
   game.load.tilemap('base-level', 'assets/tilemaps/maps/level0.json', null, Phaser.Tilemap.TILED_JSON);
 
@@ -66,6 +67,8 @@ function create() {
   collisionLayer.resizeWorld();
 
   prepareMetaObjects();
+
+  saveCrystal = game.add.sprite(100, 100, 'save-crystal');
 
   // player
   player = game.add.sprite(32, 100, 'dude');
