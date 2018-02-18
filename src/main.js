@@ -20,6 +20,7 @@ var game = new Phaser.Game(config);
 function preload() {
   this.load.spritesheet('player', 'assets/dude.png', {frameWidth: 32, frameHeight: 48});
   this.load.spritesheet('crystal', 'assets/img/save-crystal-animated.png', {frameWidth: 32, frameHeight: 32});
+  this.load.spritesheet('invader', 'assets/invader.png', {frameWidth: 32, frameHeight: 32});
 
   // base-level
   this.load.tilemapTiledJSON('map', 'assets/tilemaps/maps/level0.json');
@@ -57,6 +58,12 @@ function create() {
     frameRate: 5,
     repeat: -1
   });
+  this.anims.create({
+    key: 'invader-move',
+    frames: this.anims.generateFrameNumbers('invader', {start: 0, end: 3}),
+    frameRate: 5,
+    repeat: -1
+  });
 
   // load map with tiles
   this.map = this.make.tilemap({key: 'map'});
@@ -72,7 +79,15 @@ function create() {
   //this.map.setCollisionByExclusion([], true, this.collisionLayer);
   this.collisionLayer.setCollisionBetween(1, 999);
 
-  //prepareMetaObjects();
+  // crystal
+  this.crystal = this.add.sprite(100, 100, 'crystal', 1);
+  this.crystal.anims.play('crystal-turn', true);
+
+  // invader
+  this.invader = this.physics.add.sprite(400, 100, 'invader', 1).setVelocity(100, 0).setBounce(1, 0);
+  this.invader.body.maxVelocity.y = 200;
+  this.invader.anims.play('invader-move', true);
+  this.physics.add.collider(this.invader, this.collisionLayer);
 
   // create player sprite
   this.player = this.physics.add.sprite(32, 100, 'player', 1); // .setVelocity(0, 0).setBounce(0);
@@ -86,11 +101,8 @@ function create() {
   this.player.body.offset.y = (this.player.height - this.player.body.height);
 
   this.physics.add.collider(this.player, this.collisionLayer);
+  this.physics.add.overlap(this.player, this.invader, enemyCollision);
   // this.physics.add.overlap(player, coinLayer); // collectibles layer
-
-  // crystal
-  this.crystal = this.add.sprite(100, 100, 'crystal', 1);
-  this.crystal.anims.play('crystal-turn', true);
 
   // follow player through the level
   this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
@@ -106,7 +118,9 @@ function create() {
   this.jumpTimer = 0;
 }
 
-function update() {
+function update(time, delta) {
+
+  // player vertical movement
   this.player.body.setVelocityX(0);
   if (this.cursors.left.isDown) {
     this.player.body.setVelocityX(-200);
@@ -138,4 +152,8 @@ function update() {
       this.facing = 'idle';
     }
   }
+}
+
+function enemyCollision() {
+  console.log('enemyCollision');
 }
