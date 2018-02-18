@@ -1,18 +1,16 @@
 # awesome-game
 Awesome game!
 
+## Install
+
+To install dependencies (Phaser 3 etc.) run
+
+    npm install
 
 ## Run locally
 
-For running the game locally, you'll have to set up a simple web server.
+For running the game locally, you can use
 
-Install python and pip. After that, install Flask:
+    npm start
 
-    pip3 install Flask
-
-
-If installed, run
-
-    ./run.sh
-
-to start the webserver and open the browser with the game.
+which will start the npm `http-server`. Simple as that!
