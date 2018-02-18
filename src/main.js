@@ -21,6 +21,8 @@ function preload() {
   this.load.spritesheet('player', 'assets/dude.png', {frameWidth: 32, frameHeight: 48});
   this.load.spritesheet('crystal', 'assets/img/save-crystal-animated.png', {frameWidth: 32, frameHeight: 32});
   this.load.spritesheet('invader', 'assets/invader.png', {frameWidth: 32, frameHeight: 32});
+  this.load.image('heart-full', 'assets/img/heart-full.png', {frameWidth: 6, frameHeight: 7});
+  this.load.image('heart-half', 'assets/img/heart-half.png', {frameWidth: 6, frameHeight: 7});
 
   // base-level
   this.load.tilemapTiledJSON('map', 'assets/tilemaps/maps/level0.json');
@@ -80,17 +82,20 @@ function create() {
   this.collisionLayer.setCollisionBetween(1, 999);
 
   // crystal
-  this.crystal = this.add.sprite(100, 100, 'crystal', 1);
+  this.crystal = this.add.sprite(100, 100, 'crystal');
   this.crystal.anims.play('crystal-turn', true);
 
   // invader
-  this.invader = this.physics.add.sprite(400, 100, 'invader', 1).setVelocity(100, 0).setBounce(1, 0);
+  this.invader = this.physics.add.sprite(400, 100, 'invader').setVelocity(100, 0).setBounce(1, 0);
   this.invader.body.maxVelocity.y = 200;
   this.invader.anims.play('invader-move', true);
   this.physics.add.collider(this.invader, this.collisionLayer);
 
   // create player sprite
-  this.player = this.physics.add.sprite(32, 100, 'player', 1); // .setVelocity(0, 0).setBounce(0);
+  this.player = this.physics.add.sprite(32, 100, 'player'); // .setVelocity(0, 0).setBounce(0);
+  // player = this.player;
+  this.player.invulnerable = false;
+  this.player.health = 10;
   //this.player.body.collideWorldBounds = true;
   this.player.body.maxVelocity.y = 500;
 
@@ -100,8 +105,16 @@ function create() {
   this.player.body.offset.x = (this.player.width - this.player.body.width) / 2;
   this.player.body.offset.y = (this.player.height - this.player.body.height);
 
+  // hearts
+  this.hud = {
+    healthbar: []
+  };
+  updateHealth(this);
+
   this.physics.add.collider(this.player, this.collisionLayer);
-  this.physics.add.overlap(this.player, this.invader, enemyCollision);
+  this.physics.add.overlap(this.player, this.invader, enemyCollision, null, this);
+
+  // (object1, object2, overlapCallback, processCallback, callbackContext)
   // this.physics.add.overlap(player, coinLayer); // collectibles layer
 
   // follow player through the level
@@ -119,7 +132,6 @@ function create() {
 }
 
 function update(time, delta) {
-
   // player vertical movement
   this.player.body.setVelocityX(0);
   if (this.cursors.left.isDown) {
@@ -155,5 +167,29 @@ function update(time, delta) {
 }
 
 function enemyCollision() {
-  console.log('enemyCollision');
+  if (!this.player.invulnerable) {
+    this.cameras.main.flash(500);
+    //this.cameras.main.shake(500);
+
+    this.player.health -= 1;
+    updateHealth(this);
+    this.player.invulnerable = true;
+
+    this.time.delayedCall(500, function () {
+      this.player.invulnerable = false;
+    }, [], this);
+
+  }
+}
+
+function updateHealth(that) {
+  while (sprite = that.hud.healthbar.pop()) {
+    sprite.destroy();
+  }
+
+  for (var i = 0; i < that.player.health; i += 2) {
+    var sprite = that.player.health - i >= 2 ? 'heart-full' : 'heart-half';
+    var heart = that.add.sprite(20 + 5 * i, 20, sprite).setScrollFactor(0);
+    that.hud.healthbar.push(heart);
+  }
 }
