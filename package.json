@@ -1,0 +1,24 @@
+{
+  "name": "awesome-game",
+  "version": "0.0.6",
+  "description": "awesome game - working title",
+  "main": "awesome-game.js",
+  "scripts": {
+    "start": "./node_modules/.bin/http-server -o -s",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akleemans/awesome-game.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/akleemans/awesome-game/issues"
+  },
+  "homepage": "https://github.com/akleemans/awesome-game#readme",
+  "dependencies": {
+    "http-server": "^0.11.1",
+    "phaser": "^3.1.0"
+  }
+}
