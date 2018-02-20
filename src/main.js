@@ -1,7 +1,7 @@
 var config = {
   type: Phaser.AUTO,
   width: 352,
-  height: 192,
+  height: 212,
   pixelArt: true,
   physics: {
     default: 'arcade',
@@ -23,6 +23,7 @@ function preload() {
   this.load.spritesheet('invader', 'assets/invader.png', {frameWidth: 32, frameHeight: 32});
   this.load.image('heart-full', 'assets/img/heart-full.png', {frameWidth: 6, frameHeight: 7});
   this.load.image('heart-half', 'assets/img/heart-half.png', {frameWidth: 6, frameHeight: 7});
+  this.load.image('cog-yellow', 'assets/img/cog-yellow.png', {frameWidth: 15, frameHeight: 15});
 
   // base-level
   this.load.tilemapTiledJSON('map', 'assets/tilemaps/maps/level0.json');
@@ -105,10 +106,20 @@ function create() {
   this.player.body.offset.x = (this.player.width - this.player.body.width) / 2;
   this.player.body.offset.y = (this.player.height - this.player.body.height);
 
-  // hearts
+  // hud: bars, settings cog, hearts
   this.hud = {
-    healthbar: []
+    blackbars: null,
+    healthbar: [],
+    cog: null
   };
+  this.hud.blackbars = this.add.graphics();
+  this.hud.blackbars.fillStyle(0x000000, 1);
+  this.hud.blackbars.fillRect(0, 0, 352, 30);
+  this.hud.blackbars.fillRect(0, 212 - 30, 352, 212);
+  this.hud.blackbars.setScrollFactor(0);
+
+  this.hud.cog = this.add.sprite(352 - 18, 16, 'cog-yellow').setScrollFactor(0);
+
   updateHealth(this);
 
   this.physics.add.collider(this.player, this.collisionLayer);
@@ -118,6 +129,7 @@ function create() {
   // this.physics.add.overlap(player, coinLayer); // collectibles layer
 
   // follow player through the level
+  //this.cameras.main.setViewport(0, 20, 352, 152);
   this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
   this.cameras.main.startFollow(this.player);
 
@@ -189,7 +201,7 @@ function updateHealth(that) {
 
   for (var i = 0; i < that.player.health; i += 2) {
     var sprite = that.player.health - i >= 2 ? 'heart-full' : 'heart-half';
-    var heart = that.add.sprite(20 + 5 * i, 20, sprite).setScrollFactor(0);
+    var heart = that.add.sprite(16 + 5 * i, 15, sprite).setScrollFactor(0);
     that.hud.healthbar.push(heart);
   }
 }
