@@ -118,7 +118,14 @@ function create() {
   this.hud.blackbars.fillRect(0, 212 - 30, 352, 212);
   this.hud.blackbars.setScrollFactor(0);
 
-  this.hud.cog = this.add.sprite(352 - 18, 16, 'cog-yellow').setScrollFactor(0);
+  this.hud.cog = this.add.sprite(352 - 18, 16, 'cog-yellow').setScrollFactor(0).setInteractive();
+  this.hud.cog.on('pointerdown', function (pointer) {
+    console.log("Pressed menu cog!");
+    this.setTint(0x00ff00);
+  });
+  this.hud.cog.on('pointerup', function (pointer) {
+    this.clearTint();
+  });
 
   updateHealth(this);
 
