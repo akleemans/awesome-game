@@ -24,6 +24,7 @@ function preload() {
   this.load.image('heart-full', 'assets/img/heart-full.png', {frameWidth: 6, frameHeight: 7});
   this.load.image('heart-half', 'assets/img/heart-half.png', {frameWidth: 6, frameHeight: 7});
   this.load.image('cog-yellow', 'assets/img/cog-yellow.png', {frameWidth: 15, frameHeight: 15});
+  this.load.image('arrow', 'assets/img/arrow.png', {frameWidth: 21, frameHeight: 5});
 
   // base-level
   this.load.tilemapTiledJSON('map', 'assets/tilemaps/maps/level0.json');
@@ -148,6 +149,7 @@ function create() {
   this.cursors = this.input.keyboard.createCursorKeys();
   this.jumpButton = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACEBAR);
   this.jumpTimer = 0;
+  this.arrowTimer = 0;
 }
 
 function update(time, delta) {
@@ -161,8 +163,26 @@ function update(time, delta) {
   }
 
   // jumping
-  if ((this.cursors.space.isDown || this.cursors.up.isDown) && this.player.body.onFloor()) {
+  if (this.cursors.up.isDown && this.player.body.onFloor()) {
     this.player.body.setVelocityY(-300);
+  }
+
+  // shooting
+  if (this.cursors.space.isDown && this.arrowTimer < time) {
+    console.log("arrow!");
+    this.arrowTimer = time + 500;
+    this.arrow = this.physics.add.sprite(this.player.body.x + 20, this.player.body.y + 20, 'arrow');
+
+    if (this.facing === 'left') {
+      this.arrow.setVelocity(-500, 0);
+      this.arrow.flipX = true;
+    } else {
+      this.arrow.setVelocity(500, 0);
+    }
+
+    this.arrow.body.allowGravity = false;
+
+    // this.physics.world.collide(this.arrow, this.invader, hitEnemy);
   }
 
   // update player animation
@@ -173,15 +193,15 @@ function update(time, delta) {
     this.player.anims.play('right', true);
     this.facing = 'right';
   } else {
-    if (this.facing !== 'idle') {
-      if (this.facing === 'left') {
-        this.player.anims.play('player-idle-left');
-      }
-      else {
-        this.player.anims.play('player-idle-right');
-      }
-      this.facing = 'idle';
+    // if (this.facing !== 'idle') {
+    if (this.facing === 'left') {
+      this.player.anims.play('player-idle-left');
     }
+    else {
+      this.player.anims.play('player-idle-right');
+    }
+    // this.facing = 'idle';
+    //}
   }
 }
 
