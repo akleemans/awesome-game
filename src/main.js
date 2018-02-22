@@ -1,5 +1,5 @@
 var config = {
-  type: Phaser.AUTO,
+  type: Phaser.CANVAS,
   width: 352,
   height: 212,
   pixelArt: true,
