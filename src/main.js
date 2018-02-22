@@ -147,8 +147,8 @@ function create() {
 
   // add input
   this.cursors = this.input.keyboard.createCursorKeys();
-  this.jumpButton = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACEBAR);
-  this.jumpTimer = 0;
+  // this.jumpButton = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACEBAR);
+  // this.jumpTimer = 0;
   this.arrowTimer = 0;
 }
 
@@ -173,7 +173,7 @@ function update(time, delta) {
     this.arrowTimer = time + 500;
     this.arrow = this.physics.add.sprite(this.player.body.x + 20, this.player.body.y + 20, 'arrow');
 
-    if (this.facing === 'left') {
+    if (this.player.facing === 'left') {
       this.arrow.setVelocity(-500, 0);
       this.arrow.flipX = true;
     } else {
@@ -182,26 +182,29 @@ function update(time, delta) {
 
     this.arrow.body.allowGravity = false;
 
-    // this.physics.world.collide(this.arrow, this.invader, hitEnemy);
+    this.physics.add.collider(this.arrow, this.invader, hitEnemy);
+    //this.physics.world.collide(this.arrow, this.invader, hitEnemy);
   }
 
   // update player animation
   if (this.cursors.left.isDown) {
     this.player.anims.play('left', true);
-    this.facing = 'left';
+    this.player.facing = 'left';
+    this.player.moving = true;
   } else if (this.cursors.right.isDown) {
     this.player.anims.play('right', true);
-    this.facing = 'right';
+    this.player.facing = 'right';
+    this.player.moving = true;
   } else {
-    // if (this.facing !== 'idle') {
-    if (this.facing === 'left') {
-      this.player.anims.play('player-idle-left');
+    if (this.player.moving = true) {
+      if (this.player.facing === 'left') {
+        this.player.anims.play('player-idle-left');
+      }
+      else {
+        this.player.anims.play('player-idle-right');
+      }
     }
-    else {
-      this.player.anims.play('player-idle-right');
-    }
-    // this.facing = 'idle';
-    //}
+    this.player.moving = false;
   }
 }
 
@@ -219,6 +222,12 @@ function enemyCollision() {
     }, [], this);
 
   }
+}
+
+function hitEnemy(bullet, enemy) {
+  // removing both sprites for now - maybe trigger explosion
+  bullet.destroy();
+  enemy.destroy();
 }
 
 function updateHealth(that) {
