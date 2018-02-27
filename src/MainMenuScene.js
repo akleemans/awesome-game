@@ -23,6 +23,9 @@ var MainMenuScene = new Phaser.Class({
   },
 
   update: function (time, delta) {
+    if (this.choiceTimer === 0) {
+      this.choiceTimer = time + 200;
+    }
     if ((this.cursors.up.isDown || this.cursors.down.isDown) && time > this.choiceTimer) {
       this.choiceTimer = time + 200;
       if (this.choice === 'play') {
@@ -35,7 +38,7 @@ var MainMenuScene = new Phaser.Class({
       }
     }
 
-    if (this.cursors.space.isDown || this.cursors.right.isDown) {
+    if (time > this.choiceTimer && (this.cursors.space.isDown || this.cursors.right.isDown)) {
       if (this.choice === 'play') {
         this.scene.start('Level1Scene');
       }
