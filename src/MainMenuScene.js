@@ -11,10 +11,38 @@ var MainMenuScene = new Phaser.Class({
   },
 
   create: function () {
-    this.add.sprite(100, 100, 'arrow');
-    this.input.once('pointerdown', function (event) {
-      console.log('From MainMenuScene to Level1Scene');
-      this.scene.start('Level1Scene');
-    }, this);
+    this.choice = 'play';
+    this.arrow = this.add.sprite(80, 114, 'arrow');
+
+    this.add.text(40, 40, 'Awesome game', {fontFamily: 'Helvetica', fontSize: 32, color: '#dddddd'});
+    this.add.text(100, 100, 'Play', {fontFamily: 'Arial', fontSize: 22, color: '#ffffff'});
+    this.add.text(100, 130, 'About', {fontFamily: 'Arial', fontSize: 22, color: '#ffffff'});
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+    this.choiceTimer = 0;
+  },
+
+  update: function (time, delta) {
+    if ((this.cursors.up.isDown || this.cursors.down.isDown) && time > this.choiceTimer) {
+      this.choiceTimer = time + 200;
+      if (this.choice === 'play') {
+        this.arrow.setPosition(80, 144);
+        this.choice = 'about'
+      }
+      else {
+        this.arrow.setPosition(80, 114);
+        this.choice = 'play'
+      }
+    }
+
+    if (this.cursors.space.isDown || this.cursors.right.isDown) {
+      if (this.choice === 'play') {
+        this.scene.start('Level1Scene');
+      }
+      else {
+        this.scene.start('AboutScene');
+      }
+    }
   }
+
 });
