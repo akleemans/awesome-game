@@ -6,8 +6,15 @@ var MainMenuScene = new Phaser.Class({
     },
 
   preload: function () {
-    this.load.image('arrow', 'assets/img/arrow.png');
-
+    // pre-loading assets for game
+    this.load.spritesheet('player', 'assets/img/player.png', {frameWidth: 46, frameHeight: 46});
+    this.load.spritesheet('crystal', 'assets/img/save-crystal-animated.png', {frameWidth: 32, frameHeight: 32});
+    this.load.spritesheet('invader', 'assets/invader.png', {frameWidth: 32, frameHeight: 32});
+    this.load.spritesheet('spider', 'assets/img/spider.png', {frameWidth: 24, frameHeight: 54});
+    this.load.image('heart-full', 'assets/img/heart-full.png', {frameWidth: 6, frameHeight: 7});
+    this.load.image('heart-half', 'assets/img/heart-half.png', {frameWidth: 6, frameHeight: 7});
+    this.load.image('cog-yellow', 'assets/img/cog-yellow.png', {frameWidth: 15, frameHeight: 15});
+    this.load.image('arrow', 'assets/img/arrow.png', {frameWidth: 21, frameHeight: 5});
   },
 
   create: function () {

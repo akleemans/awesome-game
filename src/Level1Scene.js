@@ -6,15 +6,6 @@ var Level1Scene = new Phaser.Class({
     },
 
   preload: function () {
-    this.load.spritesheet('player', 'assets/img/player.png', {frameWidth: 46, frameHeight: 46});
-    this.load.spritesheet('crystal', 'assets/img/save-crystal-animated.png', {frameWidth: 32, frameHeight: 32});
-    this.load.spritesheet('invader', 'assets/invader.png', {frameWidth: 32, frameHeight: 32});
-    this.load.spritesheet('spider', 'assets/img/spider.png', {frameWidth: 24, frameHeight: 54});
-    this.load.image('heart-full', 'assets/img/heart-full.png', {frameWidth: 6, frameHeight: 7});
-    this.load.image('heart-half', 'assets/img/heart-half.png', {frameWidth: 6, frameHeight: 7});
-    this.load.image('cog-yellow', 'assets/img/cog-yellow.png', {frameWidth: 15, frameHeight: 15});
-    this.load.image('arrow', 'assets/img/arrow.png', {frameWidth: 21, frameHeight: 5});
-
     // base-level
     this.load.tilemapTiledJSON('map', 'assets/tilemaps/maps/level0.json');
     this.load.image('tiles', 'assets/tilemaps/tiles/platformer_tiles.png');
@@ -206,26 +197,26 @@ var Level1Scene = new Phaser.Class({
 
   prepareAnimations: function () {
     this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 0}),
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
       key: 'right',
-      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 8}),
+      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 7}),
       frameRate: 20,
       repeat: -1
     });
     this.anims.create({
-      key: 'player-idle-left',
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('player', {start: 8, end: 15}),
+      frameRate: 20,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'player-idle-right',
       frames: this.anims.generateFrameNumbers('player', {start: 0, end: 0}),
       frameRate: 1,
       repeat: 0
     });
     this.anims.create({
-      key: 'player-idle-right',
-      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 0}),
+      key: 'player-idle-left',
+      frames: this.anims.generateFrameNumbers('player', {start: 15, end: 15}),
       frameRate: 1,
       repeat: 0
     });
