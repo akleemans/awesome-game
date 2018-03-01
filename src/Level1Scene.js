@@ -100,6 +100,11 @@ var Level1Scene = new Phaser.Class({
   },
 
   update: function (time, delta) {
+    // reset timers in first iteration
+    if (this.arrowTimer === 0) {
+      this.arrowTimer = time + 500;
+    }
+
     // player vertical movement
     this.player.body.setVelocityX(0);
     if (this.cursors.left.isDown) {
@@ -116,23 +121,28 @@ var Level1Scene = new Phaser.Class({
 
     // shooting
     if (this.cursors.space.isDown && this.arrowTimer < time) {
-      console.log("arrow!");
       this.arrowTimer = time + 500;
-      // TODO pixel calculations for right facing, add left
-      this.arrow = this.physics.add.sprite(this.player.body.x + 30, this.player.body.y + 12, 'arrow');
+
+      // default settings for right movement
+      var v = 500;
+      var flipX = false;
+      var posX = this.player.body.x + 30;
+      var posY = this.player.body.y + 12;
 
       if (this.player.facing === 'left') {
-        this.arrow.setVelocity(-500, 0);
-        this.arrow.flipX = true;
-      } else {
-        this.arrow.setVelocity(500, 0);
+        v = -v;
+        flipX = true;
+        posX -= 60;
       }
 
+      this.arrow = this.physics.add.sprite(posX, posY, 'arrow');
+      this.arrow.setVelocity(v, 0);
+      this.arrow.flipX = flipX;
       this.arrow.body.allowGravity = false;
 
+      // TODO refactor to group
       this.physics.add.collider(this.arrow, this.invader, this.hitEnemy);
       this.physics.add.collider(this.arrow, this.spider, this.hitEnemy);
-      //this.physics.world.collide(this.arrow, this.invader, hitEnemy);
     }
 
     // update player animation
