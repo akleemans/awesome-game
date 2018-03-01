@@ -6,9 +6,10 @@ var Level1Scene = new Phaser.Class({
     },
 
   preload: function () {
-    this.load.spritesheet('player', 'assets/dude.png', {frameWidth: 32, frameHeight: 48});
+    this.load.spritesheet('player', 'assets/img/player.png', {frameWidth: 46, frameHeight: 46});
     this.load.spritesheet('crystal', 'assets/img/save-crystal-animated.png', {frameWidth: 32, frameHeight: 32});
     this.load.spritesheet('invader', 'assets/invader.png', {frameWidth: 32, frameHeight: 32});
+    this.load.spritesheet('spider', 'assets/img/spider.png', {frameWidth: 24, frameHeight: 54});
     this.load.image('heart-full', 'assets/img/heart-full.png', {frameWidth: 6, frameHeight: 7});
     this.load.image('heart-half', 'assets/img/heart-half.png', {frameWidth: 6, frameHeight: 7});
     this.load.image('cog-yellow', 'assets/img/cog-yellow.png', {frameWidth: 15, frameHeight: 15});
@@ -20,48 +21,14 @@ var Level1Scene = new Phaser.Class({
   },
 
   create: function () {
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 3}),
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('player', {start: 5, end: 8}),
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'player-idle-left',
-      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 0}),
-      frameRate: 1,
-      repeat: 0
-    });
-    this.anims.create({
-      key: 'player-idle-right',
-      frames: this.anims.generateFrameNumbers('player', {start: 5, end: 5}),
-      frameRate: 1,
-      repeat: 0
-    });
-    this.anims.create({
-      key: 'crystal-turn',
-      frames: this.anims.generateFrameNumbers('crystal', {start: 0, end: 2}),
-      frameRate: 5,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'invader-move',
-      frames: this.anims.generateFrameNumbers('invader', {start: 0, end: 3}),
-      frameRate: 5,
-      repeat: -1
-    });
+    this.prepareAnimations();
 
     // load map with tiles
     this.map = this.make.tilemap({key: 'map'});
     this.tileset = this.map.addTilesetImage('platformer_tiles', 'tiles');
 
-    this.backgroundLayer = this.map.createStaticLayer('bg', this.tileset, 0, 0);
+    // TODO removing background layer for now
+    // this.backgroundLayer = this.map.createStaticLayer('bg', this.tileset, 0, 0);
     this.baseLayer = this.map.createStaticLayer('map_tiles', this.tileset, 0, 0);
 
     // load collision layer, also a tilemap layer
@@ -80,6 +47,11 @@ var Level1Scene = new Phaser.Class({
     this.invader.body.maxVelocity.y = 200;
     this.invader.anims.play('invader-move', true);
     this.physics.add.collider(this.invader, this.collisionLayer);
+
+    // spider
+    this.spider = this.physics.add.sprite(200, 60, 'spider');
+    this.spider.body.allowGravity = false;
+    this.spider.anims.play('spider-move', true);
 
     // create player sprite
     this.player = this.physics.add.sprite(32, 100, 'player'); // .setVelocity(0, 0).setBounce(0);
@@ -118,25 +90,21 @@ var Level1Scene = new Phaser.Class({
 
     this.updateHealth(this);
 
+    // update collisions & overlaps
     this.physics.add.collider(this.player, this.collisionLayer);
     this.physics.add.overlap(this.player, this.invader, this.enemyCollision, null, this);
-
-    // (object1, object2, overlapCallback, processCallback, callbackContext)
-    // this.physics.add.overlap(player, coinLayer); // collectibles layer
+    this.physics.add.overlap(this.player, this.spider, this.enemyCollision, null, this);
 
     // follow player through the level
-    //this.cameras.main.setViewport(0, 20, 352, 152);
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player);
 
-    // scale the game - not yet available in Phaser 3
+    // TODO scale the game - not yet available in Phaser 3
     //this.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
     //this.scale.setUserScale(2, 2);
 
     // add input
     this.cursors = this.input.keyboard.createCursorKeys();
-    // this.jumpButton = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACEBAR);
-    // this.jumpTimer = 0;
     this.arrowTimer = 0;
   },
 
@@ -159,7 +127,8 @@ var Level1Scene = new Phaser.Class({
     if (this.cursors.space.isDown && this.arrowTimer < time) {
       console.log("arrow!");
       this.arrowTimer = time + 500;
-      this.arrow = this.physics.add.sprite(this.player.body.x + 20, this.player.body.y + 20, 'arrow');
+      // TODO pixel calculations for right facing, add left
+      this.arrow = this.physics.add.sprite(this.player.body.x + 30, this.player.body.y + 12, 'arrow');
 
       if (this.player.facing === 'left') {
         this.arrow.setVelocity(-500, 0);
@@ -171,6 +140,7 @@ var Level1Scene = new Phaser.Class({
       this.arrow.body.allowGravity = false;
 
       this.physics.add.collider(this.arrow, this.invader, this.hitEnemy);
+      this.physics.add.collider(this.arrow, this.spider, this.hitEnemy);
       //this.physics.world.collide(this.arrow, this.invader, hitEnemy);
     }
 
@@ -232,5 +202,51 @@ var Level1Scene = new Phaser.Class({
       var heart = that.add.sprite(16 + 5 * i, 15, sprite).setScrollFactor(0);
       that.hud.healthbar.push(heart);
     }
+  },
+
+  prepareAnimations: function () {
+    this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 0}),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 8}),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'player-idle-left',
+      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 0}),
+      frameRate: 1,
+      repeat: 0
+    });
+    this.anims.create({
+      key: 'player-idle-right',
+      frames: this.anims.generateFrameNumbers('player', {start: 0, end: 0}),
+      frameRate: 1,
+      repeat: 0
+    });
+    this.anims.create({
+      key: 'crystal-turn',
+      frames: this.anims.generateFrameNumbers('crystal', {start: 0, end: 2}),
+      frameRate: 5,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'invader-move',
+      frames: this.anims.generateFrameNumbers('invader', {start: 0, end: 3}),
+      frameRate: 5,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'spider-move',
+      frames: this.anims.generateFrameNumbers('spider', {start: 0, end: 5}),
+      frameRate: 5,
+      repeat: -1
+    });
   }
 });
