@@ -3,6 +3,7 @@ var config = {
   width: 352,
   height: 212,
   pixelArt: true,
+  backgroundColor: '#404040', // or: 4488AA
   physics: {
     default: 'arcade',
     arcade: {
