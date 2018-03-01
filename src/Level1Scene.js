@@ -214,7 +214,7 @@ var Level1Scene = new Phaser.Class({
     this.anims.create({
       key: 'right',
       frames: this.anims.generateFrameNumbers('player', {start: 0, end: 8}),
-      frameRate: 10,
+      frameRate: 20,
       repeat: -1
     });
     this.anims.create({
